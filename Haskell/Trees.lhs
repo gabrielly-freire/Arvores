@@ -43,7 +43,7 @@ de maneira generalista p/ α.
            , leftSon  :: Tree a
            , rightSon :: Tree a
            }          -> Tree a
-    deriving Eq  
+    deriving (Eq, Show)  
 \end{code}
 
 
@@ -59,6 +59,23 @@ Vamos adicionar umas árvores padrão para testes:
   t3 = Tree 3 t1 t2 
   t4 = Tree 4 t2 t3 
   t5 = Tree 5 t3 t4
+
+  -- Os exemplos padrão usados em slide:
+  tA :: Tree String 
+  tA = Tree "A" tB tC 
+
+  tB :: Tree String 
+  tB = Tree { val      = "B"
+            , leftSon  = Tree "D" Nil (Tree "J" Nil Nil)
+            , rightSon = Tree "H" Nil Nil
+            }
+
+  tC :: Tree String 
+  tC = Tree { val      = "C"
+            , leftSon  = Tree "E" Nil Nil
+            , rightSon = Tree "F" (Tree "I" Nil Nil) Nil
+            }
+
 \end{code}
 
 
@@ -70,6 +87,16 @@ Vamos definir algumas funções auxiliares:
   height (Tree _ l r) = 
    1 + max (height l) (height r)
 
+  projectFloor :: Integral i => i -> Tree a -> [a]
+  projectFloor _ Nil              = []
+  projectFloor num (Tree val tl tr)  
+    | num < 0  = error "negative Floor"
+    | num == 0 = [val]
+    | num > 0  = projectFloor (num - 1) tl 
+              ++ projectFloor (num - 1) tr
+    
+    
+
   showFloor :: (Integral i, Show a) => i -> Tree a -> String
   showFloor 0 Nil = "_"
   showFloor _ Nil = ""
@@ -78,7 +105,34 @@ Vamos definir algumas funções auxiliares:
     | num == 0 = show val
     | num > 0  = showFloor (num - 1) l ++ "," ++ showFloor (num - 1) r
 
+\end{code}
 
+Agora podemos definir o caminho em Nível: 
+
+\begin{code}
+  inPreOrder :: Tree a -> [a]
+  inPreOrder Nil            = []
+  inPreOrder (Tree val l r) =
+    [val] ++ inPreOrder l ++ inPreOrder r
+
+  inSimOrder :: Tree a -> [a]
+  inSimOrder Nil            = [] 
+  inSimOrder (Tree val l r) = 
+    inSimOrder l ++ [val] ++ inSimOrder r
+
+
+  inPosOrder :: Tree a -> [a]
+  inPosOrder Nil            = [] 
+  inPosOrder (Tree val l r) = 
+    inPosOrder l ++ inPosOrder r ++ [val]
+
+
+  inLevel :: Tree a -> [a]
+  inLevel tree = concat [projectFloor n tree | n <- [0 .. height tree - 1]]
+\end{code}
+
+
+\begin{code}
   showFormattedFloor :: (Integral i, Show a) => i -> Tree a -> String
   showFormattedFloor num tree = formatTreeStr (showFloor num tree)
     
@@ -104,7 +158,8 @@ Vamos definir algumas funções auxiliares:
 \end{code}
 
 
-\begin{code}
+\begin{code} 
+{-
   instance Show (Tree a) where 
     show :: Tree a -> String
     show Nil = "Nil"
@@ -112,7 +167,7 @@ Vamos definir algumas funções auxiliares:
       case leftSon of 
         Nil  -> ""
         tree -> ""
-
+-}
 \end{code}
 
   Esse show funfará p/ Árvores pequenas
