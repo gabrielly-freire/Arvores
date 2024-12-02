@@ -3,8 +3,9 @@ e nem hashs, mantendo simples,
 ainda que menos eficiente. 
 
 \begin{code}
- module Trees where 
+  module Trees where 
 
+  import StringFormatters
  -- import Data.IORef
  -- import Control.Monad.IO.Class (liftIO) 
 \end{code}
@@ -75,13 +76,19 @@ Vamos definir algumas funções auxiliares:
   showFloor num tree@(Tree val l r) 
     | num < 0  = error "num < 0" 
     | num == 0 = show val
-    | num > 0  = 
+    | num > 0  = showFloor (num - 1) l ++ "," ++ showFloor (num - 1) r
+
+
+  showFormattedFloor :: (Integral i, Show a) => i -> Tree a -> String
+  showFormattedFloor num tree = formatTreeStr (showFloor num tree)
+    
+    {-
       case (l,r) of 
          (Nil, Nil) -> "" 
          (Nil, r)   -> showFloor (num - 1) r 
          (l,  Nil)  -> showFloor (num - 1) l 
          (l,  r)    -> showFloor (num - 1) l ++ ", " ++ showFloor (num - 1) r  
-
+    -}
   
 
 
@@ -89,8 +96,8 @@ Vamos definir algumas funções auxiliares:
   showHeight Nil _ = [] 
   showHeight tree@(Tree val leftSon rightSon) num
     | num < 0  = error "Numero < 0"
-    | num == 0 = [show val] 
-    | num == 1 = showHeight leftSon (num - 1) ++ showHeight rightSon (num - 1)
+    | num == 0 = [show val]
+    | num == 1 = showHeight leftSon (num - 1)  ++ showHeight rightSon (num - 1)
     | num > 1  = showHeight tree (num - 1)
      
     
@@ -129,15 +136,14 @@ Vamos definir algumas funções auxiliares:
 
 
 
-djisdj
+/begin{code}
+   
+/end{code}
 
 
-\begin{code}
 
 
 
-
-\end{code}
 
 
 
