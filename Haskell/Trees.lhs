@@ -45,8 +45,57 @@ de maneira generalista p/ α.
     deriving Eq  
 \end{code}
 
+
 Talvez essa sintaxe ainda não pareça muito amigável, mas é questão de costume
 Agora vamos definir como exibir listas (`traduzí-las` em String) de uma maneira padrão. 
+
+Vamos adicionar umas árvores padrão para testes:
+
+\begin{code}
+  t0 = Nil
+  t1 = Tree 1 t0 t0 
+  t2 = Tree 2 t0 t1 
+  t3 = Tree 3 t1 t2 
+  t4 = Tree 4 t2 t3 
+  t5 = Tree 5 t3 t4
+\end{code}
+
+
+Vamos definir algumas funções auxiliares:
+
+\begin{code}
+  height :: Integral i => Tree a -> i
+  height Nil          = 0 
+  height (Tree _ l r) = 
+   1 + max (height l) (height r)
+
+  showFloor :: (Integral i, Show a) => i -> Tree a -> String
+  showFloor 0 Nil = "_"
+  showFloor _ Nil = ""
+  showFloor num tree@(Tree val l r) 
+    | num < 0  = error "num < 0" 
+    | num == 0 = show val
+    | num > 0  = 
+      case (l,r) of 
+         (Nil, Nil) -> "" 
+         (Nil, r)   -> showFloor (num - 1) r 
+         (l,  Nil)  -> showFloor (num - 1) l 
+         (l,  r)    -> showFloor (num - 1) l ++ ", " ++ showFloor (num - 1) r  
+
+  
+
+
+  showHeight :: (Show a, Integral i) => Tree a -> i -> [String]
+  showHeight Nil _ = [] 
+  showHeight tree@(Tree val leftSon rightSon) num
+    | num < 0  = error "Numero < 0"
+    | num == 0 = [show val] 
+    | num == 1 = showHeight leftSon (num - 1) ++ showHeight rightSon (num - 1)
+    | num > 1  = showHeight tree (num - 1)
+     
+    
+\end{code}
+
 
 \begin{code}
   instance Show (Tree a) where 
@@ -77,9 +126,18 @@ Agora vamos definir como exibir listas (`traduzí-las` em String) de uma maneira
 \end{code}
 
 
+
+
+
 djisdj
 
 
+\begin{code}
+
+
+
+
+\end{code}
 
 
 
