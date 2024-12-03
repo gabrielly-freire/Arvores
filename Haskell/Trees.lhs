@@ -4,7 +4,7 @@ ainda que menos eficiente.
 
 \begin{code}
   module Trees where 
-
+  import qualified Data.Tree as T
   import StringFormatters
   import Data.Time (getCurrentTime, diffUTCTime, NominalDiffTime)
  -- import Data.IORef
@@ -44,7 +44,32 @@ de maneira generalista p/ α.
            , leftSon  :: Tree a
            , rightSon :: Tree a
            }          -> Tree a
-    deriving (Eq, Show)  
+    deriving (Eq)  
+
+  toGeneralTree :: Tree a -> T.Tree a
+  toGeneralTree Nil            = error "Void Tree" 
+  toGeneralTree (Tree val l r) = 
+    case (l, r) of 
+      (Nil, Nil)               -> T.Node val []
+
+      (Tree {}, Nil) -> T.Node val [toGeneralTree l]
+
+      (Nil, Tree {}) -> T.Node val [toGeneralTree r]
+
+      (Tree {},
+       Tree {})       -> T.Node val [toGeneralTree l,
+                                     toGeneralTree r]
+      
+    
+
+
+  instance Show a => Show (Tree a) where
+    show :: Show a => Tree a -> String
+    show tree =  show $ toGeneralTree tree
+  
+  p = pretty 
+  pretty tree = putStrLn $ T.drawTree $ toGeneralTree tree
+
 
   -- Definicao útil
   leaf :: a -> Tree a 
@@ -93,7 +118,6 @@ Vamos adicionar umas árvores padrão para testes:
             }
 
 \end{code}
-
 
 Vamos definir algumas funções auxiliares:
 

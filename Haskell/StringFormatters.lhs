@@ -25,6 +25,16 @@ Formatador de Strings
 > formatTreeStr = removeFirstComma . removeDuplicatedCommas 
 
 
+> str :: String
+> str = "A: (B: (D: (_, J: (_, _)), H: (_, _)), C: (E: (_, _), F: (I: (_, _), _)))"
+
+ outsideFirstParenthesis :: String > Sring 
+ outsideFirstParenthesis ""     = "" 
+ outsideFirstParenthesis c : cs = 
+   case c of 
+     '(' -> 
+      _  -> 
+ 
 
 
 
