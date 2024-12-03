@@ -6,6 +6,7 @@ ainda que menos eficiente.
   module Trees where 
 
   import StringFormatters
+  import Data.Time (getCurrentTime, diffUTCTime, NominalDiffTime)
  -- import Data.IORef
  -- import Control.Monad.IO.Class (liftIO) 
 \end{code}
@@ -44,6 +45,21 @@ de maneira generalista p/ α.
            , rightSon :: Tree a
            }          -> Tree a
     deriving (Eq, Show)  
+
+  -- Definicao útil
+  leaf :: a -> Tree a 
+  leaf x = Tree x Nil Nil
+
+
+  timed :: (a -> b) -> a -> IO (b, NominalDiffTime)
+  timed f x =
+    do 
+      start <- getCurrentTime
+      let result = f x
+      end <- getCurrentTime
+      let duration = diffUTCTime end start
+      return (result, duration)
+    
 \end{code}
 
 
@@ -95,7 +111,6 @@ Vamos definir algumas funções auxiliares:
     | num > 0  = projectFloor (num - 1) tl 
               ++ projectFloor (num - 1) tr
     
-    
 
   showFloor :: (Integral i, Show a) => i -> Tree a -> String
   showFloor 0 Nil = "_"
@@ -130,6 +145,74 @@ Agora podemos definir o caminho em Nível:
   inLevel :: Tree a -> [a]
   inLevel tree = concat [projectFloor n tree | n <- [0 .. height tree - 1]]
 \end{code}
+
+Árvores de busca binária:
+
+\begin{code}
+  isBinarySearch :: Ord a => Tree a -> Bool
+  isBinarySearch Nil            = True 
+  isBinarySearch (Tree rootVal l r) = 
+    case (l, r) of 
+      (Nil, Nil)                 -> True 
+      (Nil, Tree rightVal l2 r2) -> rootVal < rightVal
+
+                                 && isBinarySearch l2 
+                                 && isBinarySearch r2
+
+      (Tree leftVal  l1 r1, Nil) -> leftVal < rootVal
+
+                                 && isBinarySearch l1
+                                 && isBinarySearch r1
+      (Tree leftVal  l1 r1, 
+       Tree rightVal l2 r2)      -> leftVal < rootVal
+                                 && rootVal < rightVal
+                                 
+                                 && isBinarySearch l2 
+                                 && isBinarySearch r2
+                                
+                                 && isBinarySearch l1
+                                 && isBinarySearch r1
+\end{code}
+
+
+Uns exemplos pra testes: 
+
+\begin{code}
+  exampleTree20 :: Integral i => Tree i
+  exampleTree20 =
+    Tree { val      = 20
+         , leftSon  = exampleTree10
+         , rightSon = exampleTree40
+         }    
+
+  exampleTree10 :: Integral i => Tree i
+  exampleTree10 = 
+    Tree { val      = 10 
+         , leftSon  = Nil
+         , rightSon = leaf 15
+         }    
+
+  exampleTree40 :: Integral i => Tree i
+  exampleTree40 = 
+    Tree { val      = 40
+         , leftSon  = leaf 30
+         , rightSon = Tree 50 Nil (leaf 60) 
+         }    
+
+\end{code}
+
+
+Algoritmo de Busca: 
+
+\begin{code}
+  isIn :: Ord a => a -> Tree a -> Bool
+  isIn x Nil = False
+  isIn x (Tree val l r) = 
+    x == val || x `isIn` l || x `isIn` r
+\end{code}
+
+
+
 
 
 \begin{code}
