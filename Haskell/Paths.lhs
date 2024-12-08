@@ -8,6 +8,7 @@ Lidando com os pacotes:
   module Paths where 
 
   import Trees
+  import Util
 \end{code}  
 
 Vamos adicionar umas árvores padrão para testes:
@@ -98,6 +99,8 @@ Agora, aproveitando o nome do pacote, definirei aqui
 algumas funções que mostrar-se-ão bem úteis mais adiante. 
 
 \begin{code}
+
+  -- essa ideia do "X" só deu trabalho :P
   data Direction where 
     L :: Direction -- esquerda
     R :: Direction -- direita
@@ -107,9 +110,9 @@ algumas funções que mostrar-se-ão bem úteis mais adiante.
   type Path = [Direction]
 
   -- como escrever isso usando applicative?
-  pathTo :: Eq a => a -> Tree a -> [Path]
-  pathTo x Nil = []
-  pathTo x tree@(Tree val l r) 
+  pathsTo :: Eq a => a -> Tree a -> [Path]
+  pathsTo x Nil = []
+  pathsTo x tree@(Tree val l r) 
     | x == val  = case (pl, pr) of
                     ([], []) -> [[X]]
                     (_, _) -> map (X:) (pl ++ pr)
@@ -121,8 +124,8 @@ algumas funções que mostrar-se-ão bem úteis mais adiante.
                     (xs, ys) -> map (L:) xs 
                              ++ map (R:) ys 
 
-    where pl = pathTo x l 
-          pr = pathTo x r
+    where pl = pathsTo x l 
+          pr = pathsTo x r
 
 \end{code}
 
@@ -130,6 +133,79 @@ Ok, esse código merece melhorias.. Mas se funciona..
 Agora faremos algo para separar alguns nós das árvores.
 
 \begin{code}
+  -- entradas bugadas viram a (cons Nil)
+  getNode :: Path -> Tree a -> Tree a
+  getNode (d : ds) tree@(Tree val l r) = 
+    case d of 
+      L -> getNode ds l
+      R -> getNode ds r
+      X -> tree 
+  getNode _ _ = Nil 
+  
+  -- entradas bugadas viram a id
+  deleteNode :: Path -> Tree a -> Tree a
+  deleteNode _ Nil  = Nil 
+  deleteNode [] tree = tree
+  deleteNode (d : ds) (Tree val l r) = 
+    case d of 
+      L -> Tree val (deleteNode ds l) r
+      R -> Tree val l (deleteNode ds r)
+      X -> Nil 
+
+  splitByPath :: Path -> Tree a -> (Tree a, Tree a)
+  splitByPath ds = pairing (deleteNode ds) (getNode ds)
+  
+  replaceVal :: a -> Path -> Tree a -> Tree a
+  replaceVal _ [] tree = tree
+  replaceVal _ _ Nil   = Nil
+  -- early X's would stop the list iterator
+  replaceVal x (d : ds) (Tree val l r) = 
+    case d of
+      X -> Tree x l r
+      L -> Tree val (replaceVal x ds l) r
+      R -> Tree val l (replaceVal x ds r)
+ 
+  -- unsafe
+  tradeNodes :: Path -> Path -> Tree a -> Tree a
+  tradeNodes ds ds' tree =  
+    let (x, x') = (val $ getNode ds tree, val $ getNode ds' tree)
+    in replaceVal x ds' (replaceVal x' ds tree)
+
+  
+  rightest :: Tree a -> Path 
+  rightest Nil = []
+  rightest (Tree _ l r) =
+    case (l, r) of
+      (Nil, Nil) -> [X]
+      (l, Nil)   -> L : rightest l 
+      (_, r)     -> R : rightest r
+
+  
+  rightestFromLeft :: Tree a -> Path
+  rightestFromLeft Nil            = [] 
+  rightestFromLeft (Tree _ Nil _) = [] 
+  rightestFromLeft (Tree _ l _)   = 
+    (L:) $ rightest l
+      
+
+  leftestFromRight :: Tree a -> Path
+  leftestFromRight = undefined
+
+  -- assumindo não bugados
+  concatPaths :: Path -> Path -> Path
+  concatPaths [] [] = [] 
+  concatPaths [X] ds' = ds' 
+  concatPaths (d:ds) ds' =  d : concatPaths ds ds'
+
+
+
+
+
+
+\end{code}
+
+
+  BKP
   splitByPath :: Path -> Tree a -> (Tree a, Tree a)
   splitByPath _ Nil   = (Nil, Nil) 
   splitByPath [] tree = (Nil, tree)
@@ -138,6 +214,25 @@ Agora faremos algo para separar alguns nós das árvores.
       L -> (Tree val Nil r, snd $ splitByPath ds l)
       R -> (Tree val l Nil, snd $ splitByPath ds r)
       X -> (Nil, tree)
-  
-\end{code}
+
+  Segunda tentativa:
+
+ splitByPath :: Path -> Tree a -> (Tree a, Tree a)
+  splitByPath _ Nil    = error "empty Tree" 
+  splitByPath [] _     = error "empty Path"
+  -- um X prematuro irá encerrar a busca.
+  splitByPath (X : ds) tree = (Nil, tree)
+
+  splitByPath (d : d' : ds) tree@(Tree val l r) =
+    case (d, d') of
+      (L, X) -> ()
+      (L, _) ->
+      (R, X) ->
+      (R, _) -> 
+
+    where ls = splitByPath ds l 
+          rs = splitByPath ds r 
+
+
+
 
