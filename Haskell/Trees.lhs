@@ -6,7 +6,8 @@ ainda que menos eficiente.
   module Trees where 
   --import qualified Data.Tree as T
   import StringFormatters
-  import Data.Time (getCurrentTime, diffUTCTime, NominalDiffTime)
+  import PrintTrees
+--  import Data.Time (getCurrentTime, diffUTCTime, NominalDiffTime)
  -- import Data.IORef
  -- import Control.Monad.IO.Class (liftIO) 
 \end{code}  
