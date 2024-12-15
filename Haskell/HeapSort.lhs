@@ -2,6 +2,7 @@
 
 > import Prelude hiding ( (!!) )
 > import Data.List hiding ( (!!) )
+> import Util
 
 Primeiro, façamos uma versão safe p/ 
 a (!!). 
@@ -32,6 +33,8 @@ use a [flip (<=)].
 > Nothing |>= Just _ = False
 > _ |>= _            = True 
 
+> sonsOf :: Ord a => [a] -> Integer -> (Maybe a, Maybe a)
+> sonsOf xs n = (xs !! ((2 * n) + 1), xs !! ((2 * n) + 2))
 
 > test1 :: Ord a => [a] -> Integer -> Bool
 > test1 xs n = (xs !! n) |>= (xs !! ((2 * n) + 1)) 
@@ -40,8 +43,12 @@ use a [flip (<=)].
 > test2 xs n = (xs !! n) |>= (xs !! ((2 * n) + 2)) 
 
 > isHeap :: Ord a => [a] -> Bool  
-> isHeap xs = and bs' 
->   where bs' = [test1 xs n && test2 xs n | n <- [0 .. len xs]]
+> isHeap xs   = and bs' 
+>   where bs' = [greaterThanSons xs n | n <- [0 .. len xs - 1]]
+>         greaterThanSons xs n = uncurry (&&)                          $
+>                                cross ((xs !! n) |>=) ((xs !! n) |>=) $
+>                                sonsOf xs n
+    
 
 > countdown :: Integer -> [Integer]
 > countdown x 
