@@ -1,0 +1,19 @@
+{
+  "name": "unidade-2",
+  "version": "1.0.0",
+  "description": "Implementações de Árvores Binárias, Heapsort e Árvores AVL, relacionadas à Unidade 2 da disciplina de Estruturas de Dados II (EDB2).",
+  "main": "BinarySearchTree.js",
+  "scripts": {
+    "start": "node BinarySearchTree.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "árvores-binárias",
+    "heapsort",
+    "árvores-avl",
+    "estruturas-de-dados"
+  ],
+  "author": "Gabrielly Freire",
+  "license": "ISC",
+  "type": "module"
+}
