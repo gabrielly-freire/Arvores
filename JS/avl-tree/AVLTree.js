@@ -1,4 +1,4 @@
-import BinarySearchTree from './BinarySearchTree.js';
+import BinarySearchTree from '../binary-tree/BinarySearchTree.js';
 
 export default class AVLTree extends BinarySearchTree {
     constructor(compareFn = defaultCompare) {
