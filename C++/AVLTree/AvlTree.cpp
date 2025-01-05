@@ -1,6 +1,6 @@
 #include <iostream>
 #include <queue>
-#include <iomanip>
+#include <fstream>
 
 using namespace std;
 
@@ -78,6 +78,26 @@ Node* leftRotate(Node* x) {
 }
 
 /**
+ * Função para rotacionar um nó duplamente para a direita
+ * @param x Node* nó
+ * @return Node* nó
+ */
+Node* duplicateRightRotate(Node* y) {
+    y->left = leftRotate(y->left);
+    return rightRotate(y);
+}
+
+/**
+ * Função para rotacionar um nó duplamente para a esquerda
+ * @param x Node* nó
+ * @return Node* nó
+ */
+Node* duplicateLeftRotate(Node* x) {
+    x->right = rightRotate(x->right);
+    return leftRotate(x);
+}
+
+/**
  * Função para balancear um nó
  * @param node Node* nó
  * @return Node* nó balanceado
@@ -113,7 +133,7 @@ Node* insert(Node* root, int key) {
     else if (key > root->key)
         root->right = insert(root->right, key);
     else
-        return root; // Duplicados não são permitidos
+        return root;
 
     updateHeight(root);
     return balance(root);
@@ -184,42 +204,63 @@ Node* remove(Node* root, int key) {
 }
 
 /**
- * Função para imprimir os valores de uma árvore AVL em nível
+ * Função para gerar a representação em formato DOT de um nó e seus filhos em uma árvore AVL.
  * @param root Node* raiz
- * @return void
+ * @param file ofstream arquivo de saída
  */
-//TODO: Melhorar a impressão da árvore
-void printLevelOrder(Node* root) {
+void generateDOT(Node* root, ofstream& file) {
     if (!root) return;
 
-    queue<Node*> q;
-    q.push(root);
+    if (root->left) {
+        file << "    " << root->key << " -> " << root->left->key << ";\n";
+        generateDOT(root->left, file);
+    }
 
-    while (!q.empty()) {
-        int size = q.size();
-        while (size--) {
-            Node* node = q.front();
-            q.pop();
-            cout << node->key << " ";
-            if (node->left) q.push(node->left);
-            if (node->right) q.push(node->right);
-        }
-        cout << endl;
+    if (root->right) {
+        file << "    " << root->key << " -> " << root->right->key << ";\n";
+        generateDOT(root->right, file);
     }
 }
 
 /**
- * Função principal para testar a árvore AVL implementada
+ * Função para exportar uma árvore AVL para um arquivo JPEG
+ * @param root Node* raiz
+ * @param filename string nome do arquivo
  */
-int main() {
+void exportToJPEG(Node* root, const string& filename) {
+    string dotFile = filename + ".dot";
+    string jpegFile = filename + ".jpeg";
+
+    ofstream file(dotFile);
+    file << "digraph AVLTree {\n";
+    file << "    node [shape=circle];\n";
+
+    if (root) {
+        generateDOT(root, file);
+    }
+
+    file << "}\n";
+    file.close();
+
+    string command = "dot -Tjpeg " + dotFile + " -o " + jpegFile;
+    int result = system(command.c_str());
+
+    if (result == 0) {
+        cout << "Arquivo JPEG gerado em: " << jpegFile << endl;
+    } else {
+        cerr << "Erro ao gerar o arquivo JPEG. Verifique se o Graphviz está instalado e acessível." << endl;
+    }
+}
+
+/**
+ * Função para exportar uma árvore AVL em nível conforme os valores dados pela questão
+ */
+void exportTreeInLevel() {
     Node* root = nullptr;
     int values[] = {15, 18, 20, 35, 32, 38, 30, 40, 32, 45, 48, 52, 60, 50};
 
     for (int value : values)
         root = insert(root, value);
 
-    cout << "Árvore AVL em nível:\n";
-    printLevelOrder(root);
-
-    return 0;
+     exportToJPEG(root, "avl_tree");
 }
