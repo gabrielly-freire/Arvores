@@ -164,6 +164,14 @@ private:
         v->pai = u->pai;
     }
 
+    void inOrder(NoRB* no) {
+        if (no != TNULL) {
+            inOrder(no->esquerda);
+            cout << no->item << " (" << no->cor << ") ";
+            inOrder(no->direita);
+        }
+    }
+
 public:
     ArvoreRubroNegra() {
         inicializarTNULL();
@@ -263,28 +271,12 @@ public:
         return no;
     }
 
-    void emNivel() {
+    void emOrdem() {
         if (root == TNULL) {
-            cout << "\u00c1rvore está vazia." << endl;
+            cout << "Arvore está vazia." << endl;
             return;
         }
-
-        queue<NoRB*> fila;
-        fila.push(root);
-
-        while (!fila.empty()) {
-            NoRB* atual = fila.front();
-            fila.pop();
-            cout << atual->item << " (" << atual->cor << ") ";
-
-            if (atual->esquerda != TNULL) {
-                fila.push(atual->esquerda);
-            }
-
-            if (atual->direita != TNULL) {
-                fila.push(atual->direita);
-            }
-        }
+        inOrder(root);
         cout << endl;
     }
 };
@@ -292,6 +284,21 @@ public:
 int main() {
     ArvoreRubroNegra arvore;
     int opcao = 0;
+
+    arvore.inserir(15);
+    arvore.inserir(18);
+    arvore.inserir(20);
+    arvore.inserir(35);
+    arvore.inserir(32);
+    arvore.inserir(38);
+    arvore.inserir(30);
+    arvore.inserir(40);
+    arvore.inserir(32);
+    arvore.inserir(45);
+    arvore.inserir(48);
+    arvore.inserir(52);
+    arvore.inserir(60);
+    arvore.inserir(50);
 
     while (opcao != 5) {
         cout << "*************************************" << endl;
@@ -326,7 +333,7 @@ int main() {
                 cout << "Valor " << x << " nao encontrado na arvore." << endl;
             }
         } else if (opcao == 4) {
-            arvore.emNivel();
+            arvore.emOrdem();
         } else if (opcao == 5) {
             cout << "Saindo do programa..." << endl;
             break;
