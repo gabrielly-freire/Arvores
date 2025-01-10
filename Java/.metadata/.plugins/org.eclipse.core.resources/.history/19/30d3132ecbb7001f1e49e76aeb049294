@@ -1,0 +1,115 @@
+package Arvore;
+
+public class Metodos<T> {
+    private No<T> raiz;
+    private int qntd = 0;
+
+    public int getQntd() {
+        return qntd;
+    }
+
+    public void setQntd(int qntd) {
+        this.qntd = qntd;
+    }
+
+    public No<T> getRaiz() {
+        return raiz;
+    }
+
+    public void setRaiz(No<T> raiz) {
+        this.raiz = raiz;
+    }
+
+    public void inserir(int id, T dados) {
+        No<T> novoNo = new No<>(id, dados);
+
+        if (getRaiz() == null) {
+            setRaiz(novoNo);
+        } else {
+            inserirRec(getRaiz(), novoNo);
+        }
+        qntd++;
+    }
+
+    private void inserirRec(No<T> atualNo, No<T> novoNo) {
+        if (novoNo.getId() < atualNo.getId()) {
+            if (atualNo.getEsq() == null) {
+                atualNo.setEsq(novoNo);
+            } else {
+                inserirRec(atualNo.getEsq(), novoNo);
+            }
+        } else {
+            if (atualNo.getDir() == null) {
+                atualNo.setDir(novoNo);
+            } else {
+                inserirRec(atualNo.getDir(), novoNo);
+            }
+        }
+    }
+
+    // Método para remover um nó com um determinado id
+    public void remover(int id) {
+        raiz = removerRec(raiz, id);
+    }
+
+    // Método recursivo de remoção
+    private No<T> removerRec(No<T> raiz, int id) {
+        // Se a raiz é nula, não há nada para remover
+        if (raiz == null) {
+            return raiz;
+        }
+
+        if (id < raiz.getId()) {
+            raiz.setEsq(removerRec(raiz.getEsq(), id));
+        } else if (id > raiz.getId()) {
+            raiz.setDir(removerRec(raiz.getDir(), id));
+        } else {
+            // Encontramos o nó a ser removido
+            qntd--;
+
+            // Caso 1: Nó sem filho à esquerda
+            if (raiz.getEsq() == null) {
+                return raiz.getDir();
+            }
+            // Caso 2: Nó sem filho à direita
+            else if (raiz.getDir() == null) {
+                return raiz.getEsq();
+            }
+
+            // Caso 3: Nó com dois filhos
+            // Encontra o sucessor (menor nó da subárvore direita)
+            No<T> sucessor = minValueNode(raiz.getDir());
+
+            // Remove o sucessor da subárvore direita
+            No<T> subArvoreDireitaSemSucessor = removerRec(raiz.getDir(), sucessor.getId());
+
+            // Cria um novo nó substituto com id e dados do sucessor
+            No<T> novoNo = new No<>(sucessor.getId(), sucessor.getDados());
+            novoNo.setEsq(raiz.getEsq());
+            novoNo.setDir(subArvoreDireitaSemSucessor);
+
+            return novoNo;
+        }
+
+        return raiz;
+    }
+
+    // Método auxiliar para encontrar o nó de menor valor dado um nó de referência
+    private No<T> minValueNode(No<T> no) {
+        No<T> atual = no;
+        while (atual.getEsq() != null) {
+            atual = atual.getEsq();
+        }
+        return atual;
+    }
+
+    private No<T> busca(No<T> raiz, int chave) {
+        if (raiz == null || raiz.getId() == chave) {
+            return raiz;
+        } else if (raiz.getId() > chave) {
+            return busca(raiz.getEsq(), chave);
+        } else {
+            return busca(raiz.getDir(), chave);
+        }
+    }
+}

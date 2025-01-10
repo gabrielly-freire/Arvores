@@ -1,0 +1,136 @@
+package Aplicacoes;
+
+import Entidades.Arvore;
+import Entidades.No;
+
+public class Metodos<T> {
+
+    // BUSCA (semelhante à BST)
+    public No<T> buscaRec(Arvore<T> arv, No<T> atual, int id) {
+        if (atual == arv.getNIL() || atual.getId() == id) {
+            return atual;
+        }
+        if (id < atual.getId()) {
+            return buscaRec(arv, atual.getEsq(), id);
+        } else {
+            return buscaRec(arv, atual.getDir(), id);
+        }
+    }
+
+    public No<T> buscar(Arvore<T> arv, int id) {
+        return buscaRec(arv, arv.getRaiz(), id);
+    }
+
+    // ROTAÇÕES
+    private void rotacaoEsquerda(Arvore<T> arv, No<T> x) {
+        No<T> y = x.getDir();
+        x.setDir(y.getEsq());
+        if (y.getEsq() != arv.getNIL()) {
+            y.getEsq().setPai(x);
+        }
+        y.setPai(x.getPai());
+        if (x.getPai() == arv.getNIL()) {
+            arv.setRaiz(y);
+        } else if (x == x.getPai().getEsq()) {
+            x.getPai().setEsq(y);
+        } else {
+            x.getPai().setDir(y);
+        }
+        y.setEsq(x);
+        x.setPai(y);
+    }
+
+    private void rotacaoDireita(Arvore<T> arv, No<T> x) {
+        No<T> y = x.getEsq();
+        x.setEsq(y.getDir());
+        if (y.getDir() != arv.getNIL()) {
+            y.getDir().setPai(x);
+        }
+        y.setPai(x.getPai());
+        if (x.getPai() == arv.getNIL()) {
+            arv.setRaiz(y);
+        } else if (x == x.getPai().getDir()) {
+            x.getPai().setDir(y);
+        } else {
+            x.getPai().setEsq(y);
+        }
+        y.setDir(x);
+        x.setPai(y);
+    }
+
+    // INSERÇÃO
+    public void inserir(Arvore<T> arv, int id, T dados) {
+        No<T> z = new No<>(id, dados);
+        No<T> y = arv.getNIL();
+        No<T> x = arv.getRaiz();
+
+        // Inserção tipo BST
+        while (x != arv.getNIL()) {
+            y = x;
+            if (z.getId() < x.getId()) {
+                x = x.getEsq();
+            } else {
+                x = x.getDir();
+            }
+        }
+        z.setPai(y);
+        if (y == arv.getNIL()) {
+            arv.setRaiz(z);
+        } else if (z.getId() < y.getId()) {
+            y.setEsq(z);
+        } else {
+            y.setDir(z);
+        }
+
+        z.setEsq(arv.getNIL());
+        z.setDir(arv.getNIL());
+        z.setCor(No.Cor.RED);
+
+        // Ajuste após inserção
+        inserirFixUp(arv, z);
+    }
+
+    private void inserirFixUp(Arvore<T> arv, No<T> z) {
+        while (z.getPai().getCor() == No.Cor.RED) {
+            if (z.getPai() == z.getPai().getPai().getEsq()) {
+                No<T> y = z.getPai().getPai().getDir();
+                if (y.getCor() == No.Cor.RED) {
+                    z.getPai().setCor(No.Cor.BLACK);
+                    y.setCor(No.Cor.BLACK);
+                    z.getPai().getPai().setCor(No.Cor.RED);
+                    z = z.getPai().getPai();
+                } else {
+                    if (z == z.getPai().getDir()) {
+                        z = z.getPai();
+                        rotacaoEsquerda(arv, z);
+                    }
+                    z.getPai().setCor(No.Cor.BLACK);
+                    z.getPai().getPai().setCor(No.Cor.RED);
+                    rotacaoDireita(arv, z.getPai().getPai());
+                }
+            } else {
+                No<T> y = z.getPai().getPai().getEsq();
+                if (y.getCor() == No.Cor.RED) {
+                    z.getPai().setCor(No.Cor.BLACK);
+                    y.setCor(No.Cor.BLACK);
+                    z.getPai().getPai().setCor(No.Cor.RED);
+                    z = z.getPai().getPai();
+                } else {
+                    if (z == z.getPai().getEsq()) {
+                        z = z.getPai();
+                        rotacaoDireita(arv, z);
+                    }
+                    z.getPai().setCor(No.Cor.BLACK);
+                    z.getPai().getPai().setCor(No.Cor.RED);
+                    rotacaoEsquerda(arv, z.getPai().getPai());
+                }
+            }
+        }
+        arv.getRaiz().setCor(No.Cor.BLACK);
+    }
+
+    // REMOÇÃO
+    public void remover(Arvore<T> arv, int id) {
+        No<T> z = buscar(arv, id);
+        if (z == arv.getNIL())
+

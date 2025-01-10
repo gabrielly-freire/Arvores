@@ -1,0 +1,11 @@
+INDEX VERSION 1.134+C:\Users\gusta\OneDrive\Documentos\edb2\Arvores-EDB2\.metadata\.plugins\org.eclipse.jdt.core
+3892853788.index
+4016437253.index
+1895919014.index
+1865797976.index
+2528723105.index
+2668563594.index
+101080368.index
+23828777.index
+3524841702.index
+1986832831.index

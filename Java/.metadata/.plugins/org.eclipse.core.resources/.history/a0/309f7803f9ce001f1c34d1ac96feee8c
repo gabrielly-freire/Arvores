@@ -1,0 +1,131 @@
+package Arvore;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class ABB<T> {
+    // Raiz da árvore binária de busca (ABB)
+    private No<T> raiz;
+
+    /**
+     * Método público para inserir um novo nó na árvore.
+     * @param id - Identificador único do nó (usado para ordenação)
+     * @param dados - Dados armazenados no nó
+     */
+    public void inserir(int id, T dados) {
+        No<T> novoNo = new No<>(id, dados); // Cria um novo nó com o ID e os dados fornecidos
+
+        // Se a árvore está vazia, define o novo nó como a raiz
+        if (getRaiz() == null) {
+            setRaiz(novoNo);
+        } else {
+            // Insere recursivamente a partir da raiz
+            inserirRec(getRaiz(), novoNo);
+        }
+    }
+
+    /**
+     * Método recursivo para inserir o novo nó na posição correta da árvore.
+     * @param atualNo - Nó atual sendo analisado
+     * @param novoNo - Novo nó que será inserido
+     */
+    private void inserirRec(No<T> atualNo, No<T> novoNo) {
+        if (novoNo.getId() < atualNo.getId()) { // Se o ID do novo nó for menor, vai para a subárvore à esquerda
+            if (atualNo.getEsq() == null) {
+                atualNo.setEsq(novoNo); // Define o novo nó como filho esquerdo
+            } else {
+                inserirRec(atualNo.getEsq(), novoNo); // Continua recursivamente na subárvore esquerda
+            }
+        } else { // Caso contrário, vai para a subárvore à direita
+            if (atualNo.getDir() == null) {
+                atualNo.setDir(novoNo); // Define o novo nó como filho direito
+            } else {
+                inserirRec(atualNo.getDir(), novoNo); // Continua recursivamente na subárvore direita
+            }
+        }
+    }
+
+    /**
+     * Método para imprimir os nós da árvore em Pré-Ordem (raiz, esquerda, direita).
+     */
+    public void imprimirPreOrdem() {
+        imprimirPreOrdemRec(getRaiz()); // Inicia a impressão a partir da raiz
+    }
+
+    /**
+     * Método recursivo para imprimir os nós em Pré-Ordem.
+     * @param no - Nó atual sendo analisado
+     */
+    private void imprimirPreOrdemRec(No<T> no) {
+        if (no != null) {
+            System.out.println("ID: " + no.getId() + ", Dados: " + no.getDados()); // Imprime o nó atual
+            imprimirPreOrdemRec(no.getEsq()); // Visita a subárvore esquerda
+            imprimirPreOrdemRec(no.getDir()); // Visita a subárvore direita
+        }
+    }
+
+    /**
+     * Método para imprimir os nós da árvore em Ordem Simétrica (esquerda, raiz, direita).
+     * @param no - Nó atual sendo analisado
+     */
+    public void imprimirOrdemSimetrica(No<T> no) {
+        if (no != null) {
+            imprimirOrdemSimetrica(no.getEsq()); // Visita a subárvore esquerda
+            System.out.println("ID: " + no.getId() + ", Dados: " + no.getDados()); // Imprime o nó atual
+            imprimirOrdemSimetrica(no.getDir()); // Visita a subárvore direita
+        }
+    }
+
+    /**
+     * Método para imprimir os nós da árvore em Pós-Ordem (direita, esquerda, raiz).
+     * @param no - Nó atual sendo analisado
+     */
+    public void imprimirPosOrdem(No<T> no) {
+        if (no != null) {
+            imprimirPosOrdem(no.getDir()); // Visita a subárvore direita
+            System.out.println("ID: " + no.getId() + ", Dados: " + no.getDados()); // Imprime o nó atual
+            imprimirPosOrdem(no.getEsq()); // Visita a subárvore esquerda
+        }
+    }
+
+    /**
+     * Método para imprimir os nós da árvore por nível (BFS - Breadth First Search).
+     */
+    public void imprimirNivel() {
+        if (getRaiz() == null) {
+            return; // Retorna se a árvore estiver vazia
+        }
+
+        Queue<No<T>> fila = new LinkedList<>(); // Fila para armazenar os nós a serem visitados
+        fila.add(getRaiz()); // Adiciona a raiz na fila
+
+        while (!fila.isEmpty()) {
+            No<T> atual = fila.poll(); // Remove o nó da frente da fila
+            System.out.println("ID: " + atual.getId() + ", Dados: " + atual.getDados()); // Imprime o nó atual
+
+            if (atual.getEsq() != null) {
+                fila.add(atual.getEsq()); // Adiciona o filho esquerdo na fila
+            }
+
+            if (atual.getDir() != null) {
+                fila.add(atual.getDir()); // Adiciona o filho direito na fila
+            }
+        }
+    }
+
+    /**
+     * Getter para a raiz da árvore.
+     * @return A raiz da árvore.
+     */
+    public No<T> getRaiz() {
+        return raiz;
+    }
+
+    /**
+     * Setter para a raiz da árvore.
+     * @param raiz - A nova raiz da árvore.
+     */
+    public void setRaiz(No<T> raiz) {
+        this.raiz = raiz;
+    }
+}

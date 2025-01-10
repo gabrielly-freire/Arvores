@@ -1,0 +1,204 @@
+package Aplicacoes;
+
+import Entidades.No;
+import Entidades.Arvore;
+
+public class Metodos<T> {
+
+    private int altura(No<T> n) {
+        if (n == null) return 0;
+        return n.getAltura();
+    }
+
+    private int fatorBalanceamento(No<T> n) {
+        if (n == null) return 0;
+        return altura(n.getEsq()) - altura(n.getDir());
+    }
+
+    private void atualizarAltura(No<T> n) {
+        if (n != null) {
+            int alturaEsq = altura(n.getEsq());
+            int alturaDir = altura(n.getDir());
+            n.setAltura(1 + Math.max(alturaEsq, alturaDir));
+        }
+    }
+
+    // Rotação à direita
+    // Desbalanceamento na subárvore esquerda
+    private No<T> rotacaoDireita(No<T> y) {
+        No<T> x = y.getEsq();
+        No<T> T2 = x.getDir();
+
+        // Rotaciona
+        x.setDir(y);
+        y.setEsq(T2);
+
+        // Atualiza alturas
+        atualizarAltura(y);
+        atualizarAltura(x);
+
+        // x passa a ser a nova raiz da subárvore
+        return x;
+    }
+
+    // Rotação à esquerda
+    // Desbalanceamento na subárvore direita
+    private No<T> rotacaoEsquerda(No<T> x) {
+        No<T> y = x.getDir();
+        No<T> T2 = y.getEsq();
+
+        // Rotaciona
+        y.setEsq(x);
+        x.setDir(T2);
+
+        // Atualiza alturas
+        atualizarAltura(x);
+        atualizarAltura(y);
+
+        // y passa a ser a nova raiz da subárvore
+        return y;
+    }
+
+    // --- Inserção AVL ---
+    public No<T> inserir(No<T> raiz, int id, T dados) {
+        // Inserção BST padrão
+        if (raiz == null) {
+            return new No<>(id, dados);
+        }
+
+        if (id < raiz.getId()) {
+            raiz.setEsq(inserir(raiz.getEsq(), id, dados));
+        } else if (id > raiz.getId()) {
+            raiz.setDir(inserir(raiz.getDir(), id, dados));
+        } else {
+            // IDs iguais não inserimos novamente (depende da regra)
+            return raiz;
+        }
+
+        // Atualiza altura do nó atual
+        atualizarAltura(raiz);
+
+        // Verifica fator de balanceamento
+        int fb = fatorBalanceamento(raiz);
+
+        // Caso 1: Desbalanceamento Esquerda-Esquerda
+        if (fb > 1 && id < raiz.getEsq().getId()) {
+            return rotacaoDireita(raiz);
+        }
+
+        // Caso 2: Desbalanceamento Esquerda-Direita
+        if (fb > 1 && id > raiz.getEsq().getId()) {
+            raiz.setEsq(rotacaoEsquerda(raiz.getEsq()));
+            return rotacaoDireita(raiz);
+        }
+
+        // Caso 3: Desbalanceamento Direita-Direita
+        if (fb < -1 && id > raiz.getDir().getId()) {
+            return rotacaoEsquerda(raiz);
+        }
+
+        // Caso 4: Desbalanceamento Direita-Esquerda
+        if (fb < -1 && id < raiz.getDir().getId()) {
+            raiz.setDir(rotacaoDireita(raiz.getDir()));
+            return rotacaoEsquerda(raiz);
+        }
+
+        return raiz;
+    }
+
+    public No<T> buscar(No<T> atual, int id) {
+        if (atual == null || atual.getId() == id) {
+            return atual;
+        }
+        if (id < atual.getId()) {
+            return buscar(atual.getEsq(), id);
+        }
+        return buscar(atual.getDir(), id);
+    }
+
+    // --- Remoção AVL ---
+    public No<T> remover(No<T> raiz, int id) {
+        if (raiz == null) {
+            return raiz;
+        }
+
+        if (id < raiz.getId()) {
+            raiz.setEsq(remover(raiz.getEsq(), id));
+        } else if (id > raiz.getId()) {
+            raiz.setDir(remover(raiz.getDir(), id));
+        } else {
+            if (raiz.getEsq() == null || raiz.getDir() == null) {
+                No<T> temp = (raiz.getEsq() != null) ? raiz.getEsq() : raiz.getDir();
+                if (temp == null) {
+                    // Sem filhos
+                    raiz = null;
+                } else {
+                    // Um filho
+                    raiz = temp;
+                }
+            } else {
+                // Dois filhos: obtém o sucessor (menor nó da subárvore direita)
+                No<T> sucessor = getMinimo(raiz.getDir());
+                raiz.setId(sucessor.getId());
+                raiz.setDados(sucessor.getDados());
+                raiz.setDir(remover(raiz.getDir(), sucessor.getId()));
+            }
+        }
+
+        // Se a raiz for nula (remoção de nó folha)
+        if (raiz == null) {
+            return raiz;
+        }
+
+        // Atualiza altura
+        atualizarAltura(raiz);
+
+        // Verifica o balanceamento
+        int fb = fatorBalanceamento(raiz);
+
+        // Caso 1: Esquerda-Esquerda
+        if (fb > 1 && fatorBalanceamento(raiz.getEsq()) >= 0) {
+            return rotacaoDireita(raiz);
+        }
+
+        // Caso 2: Esquerda-Direita
+        if (fb > 1 && fatorBalanceamento(raiz.getEsq()) < 0) {
+            raiz.setEsq(rotacaoEsquerda(raiz.getEsq()));
+            return rotacaoDireita(raiz);
+        }
+
+        // Caso 3: Direita-Direita
+        if (fb < -1 && fatorBalanceamento(raiz.getDir()) <= 0) {
+            return rotacaoEsquerda(raiz);
+        }
+
+        // Caso 4: Direita-Esquerda
+        if (fb < -1 && fatorBalanceamento(raiz.getDir()) > 0) {
+            raiz.setDir(rotacaoDireita(raiz.getDir()));
+            return rotacaoEsquerda(raiz);
+        }
+
+        return raiz;
+    }
+
+    private No<T> getMinimo(No<T> nodo) {
+        No<T> atual = nodo;
+        while (atual.getEsq() != null) {
+            atual = atual.getEsq();
+        }
+        return atual;
+    }
+
+    // Métodos públicos para facilitar o uso com a classe Arvore<T>
+    public void inserir(Arvore<T> arv, int id, T dados) {
+        arv.setRaiz(inserir(arv.getRaiz(), id, dados));
+    }
+
+    public void remover(Arvore<T> arv, int id) {
+        arv.setRaiz(remover(arv.getRaiz(), id));
+    }
+
+    public No<T> buscar(Arvore<T> arv, int id) {
+        return buscar(arv.getRaiz(), id);
+    }
+}

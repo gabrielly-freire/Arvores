@@ -1,0 +1,55 @@
+package Entidades;
+
+public class No<T> {
+    private No<T> esq;
+    private No<T> dir;
+    private int id;
+    private T dados;
+    private int altura; // para AVL
+
+    public No(int id, T dados) {
+        this.id = id;
+        this.dados = dados;
+        this.altura = 1; // altura inicial do nó folha
+    }
+
+    public No<T> getEsq() {
+        return esq;
+    }
+
+    public void setEsq(No<T> esq) {
+        this.esq = esq;
+    }
+
+    public No<T> getDir() {
+        return dir;
+    }
+
+    public void setDir(No<T> dir) {
+        this.dir = dir;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+		this.id = id;
+	}
+
+    public T getDados() {
+        return dados;
+    }
+
+    public void setDados(T dados) {
+        this.dados = dados;
+    }
+
+    public int getAltura() {
+        return altura;
+    }
+
+    public void setAltura(int altura) {
+        this.altura = altura;
+    }
+}

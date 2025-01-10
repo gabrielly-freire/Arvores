@@ -1,0 +1,22 @@
+package Entidades;
+
+public class Arvore<T> {
+    private No<T> raiz;
+    private int qntd = 0;
+
+    public int getQntd() {
+        return qntd;
+    }
+
+    public void setQntd(int qntd) {
+        this.qntd = qntd;
+    }
+
+    public No<T> getRaiz() {
+        return raiz;
+    }
+
+    public void setRaiz(No<T> raiz) {
+        this.raiz = raiz;
+    }
+}
