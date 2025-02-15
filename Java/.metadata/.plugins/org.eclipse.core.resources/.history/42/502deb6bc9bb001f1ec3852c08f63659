@@ -1,0 +1,79 @@
+package Aplicacoes;
+
+import Entidades.*;
+
+public class Metodos<T> {
+    private Arvore<T> arvore;
+
+    public Metodos(Arvore<T> arvore) {
+        this.arvore = arvore;
+    }
+
+    public void inserir(int id, T dados) {
+        arvore.setRaiz(inserirRec(arvore.getRaiz(), id, dados));
+    }
+
+    private No<T> inserirRec(No<T> atual, int id, T dados) {
+        if (atual == null) {
+            return new No<T>(id, dados);
+        }
+        if (id < atual.getId()) {
+            atual.setEsq(inserirRec(atual.getEsq(), id, dados));
+        } else if (id > atual.getId()) {
+            atual.setDir(inserirRec(atual.getDir(), id, dados));
+        }
+        return atual; // sem balancear
+    }
+
+    private No<T> rotacaoEsquerda(No<T> no) {
+        No<T> aux = no.getDir();
+        no.setDir(aux.getEsq());
+        aux.setEsq(no);
+        return aux;
+    }
+
+    private No<T> rotacaoDireita(No<T> no) {
+        No<T> aux = no.getEsq();
+        no.setEsq(aux.getDir());
+        aux.setDir(no);
+        return aux;
+    }
+
+    private No<T> rotacaoDuplaEsquerda(No<T> no) {
+        no.setDir(rotacaoDireita(no.getDir()));
+        return rotacaoEsquerda(no);
+    }
+
+    private No<T> rotacaoDuplaDireita(No<T> no) {
+        no.setEsq(rotacaoEsquerda(no.getEsq()));
+        return rotacaoDireita(no);
+    }
+    
+    public void aplicarRotacaoEsquerdaNaRaiz() {
+        No<T> raiz = arvore.getRaiz();
+        if (raiz != null && raiz.getDir() != null) {
+            arvore.setRaiz(rotacaoEsquerda(raiz));
+        }
+    }
+    
+    public void aplicarRotacaoDireitaNaRaiz() {
+        No<T> raiz = arvore.getRaiz();
+        if (raiz != null && raiz.getEsq() != null) {
+            arvore.setRaiz(rotacaoDireita(raiz));
+        }
+    }
+    
+    public void aplicarRotacaoDuplaEsquerdaNaRaiz() {
+        No<T> raiz = arvore.getRaiz();
+        if (raiz != null && raiz.getDir() != null && raiz.getDir().getEsq() != null) {
+            arvore.setRaiz(rotacaoDuplaEsquerda(raiz));
+        }
+    }
+    
+    public void aplicarRotacaoDuplaDireitaNaRaiz() {
+        No<T> raiz = arvore.getRaiz();
+        if (raiz != null && raiz.getEsq() != null && raiz.getEsq().getDir() != null) {
+            arvore.setRaiz(rotacaoDuplaDireita(raiz));
+        }
+    }
+}

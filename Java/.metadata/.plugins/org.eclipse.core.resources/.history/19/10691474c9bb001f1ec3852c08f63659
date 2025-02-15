@@ -1,0 +1,36 @@
+package Main;
+
+import Aplicacoes.Metodos;
+import Entidades.Arvore;
+
+public class Main {
+    public static void main(String[] args) {
+        // Criamos a árvore e passamos para a classe de métodos
+        Arvore<String> arvore = new Arvore<>();
+        Metodos<String> metodos = new Metodos<>(arvore);
+        
+        // Inserindo valores (como se fosse uma árvore de busca)
+        metodos.inserir(30, "A");
+        metodos.inserir(20, "B");
+        metodos.inserir(40, "C");
+        metodos.inserir(50, "D");
+        
+        // Neste ponto a árvore está desbalanceada para a direita
+        // Podemos aplicar uma rotação à esquerda na raiz, por exemplo:
+        metodos.aplicarRotacaoEsquerdaNaRaiz();
+        
+        // Agora a raiz deve ser o nó com id=40
+        System.out.println("Nova raiz: " + arvore.getRaiz().getId());
+        
+        // Vamos fazer mais inserções para simular uma rotação dupla
+        metodos.inserir(45, "E");
+        
+        // Suponha que a árvore tenha ficado desbalanceada de forma 
+        // a exigir uma rotação dupla à esquerda
+        // Podemos chamar:
+        metodos.aplicarRotacaoDuplaEsquerdaNaRaiz();
+        
+        // Verificando a nova raiz após a rotação dupla
+        System.out.println("Nova raiz após rotação dupla: " + arvore.getRaiz().getId());
+    }
+}

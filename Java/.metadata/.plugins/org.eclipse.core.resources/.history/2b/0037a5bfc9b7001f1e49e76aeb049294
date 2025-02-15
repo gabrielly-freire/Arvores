@@ -1,0 +1,114 @@
+package Arvore;
+
+public class Metodos<T> {
+    private No<T> raiz;
+    private int qntd = 0;
+
+    public int getQntd() {
+        return qntd;
+    }
+
+    public void setQntd(int qntd) {
+        this.qntd = qntd;
+    }
+
+    public No<T> getRaiz() {
+        return raiz;
+    }
+
+    public void setRaiz(No<T> raiz) {
+        this.raiz = raiz;
+    }
+
+    public void inserir(int id, T dados) {
+        No<T> novoNo = new No<>(id, dados);
+
+        if (getRaiz() == null) {
+            setRaiz(novoNo);
+        } else {
+            inserirRec(getRaiz(), novoNo);
+        }
+        qntd++;
+    }
+
+    private void inserirRec(No<T> atualNo, No<T> novoNo) {
+        if (novoNo.getId() < atualNo.getId()) {
+            if (atualNo.getEsq() == null) {
+                atualNo.setEsq(novoNo);
+            } else {
+                inserirRec(atualNo.getEsq(), novoNo);
+            }
+        } else {
+            if (atualNo.getDir() == null) {
+                atualNo.setDir(novoNo);
+            } else {
+                inserirRec(atualNo.getDir(), novoNo);
+            }
+        }
+    }
+
+    public void removerNo(int id) {
+        No<T>[] resultadoBusca = busca(id);
+        No<T> pai = resultadoBusca[0];
+        No<T> alvo = resultadoBusca[1];
+
+        if (alvo == null) {
+            System.out.println("Nó com ID " + id + " não encontrado.");
+            return;
+        }
+
+        if (alvo.getEsq() == null && alvo.getDir() == null) {
+            if (pai == null) {
+                setRaiz(null);
+            } else if (pai.getEsq() == alvo) {
+                pai.setEsq(null);
+            } else {
+                pai.setDir(null);
+            }
+        } else if (alvo.getEsq() == null || alvo.getDir() == null) {
+            No<T> filho = (alvo.getEsq() != null) ? alvo.getEsq() : alvo.getDir();
+
+            if (pai == null) {
+                setRaiz(filho);
+            } else if (pai.getEsq() == alvo) {
+                pai.setEsq(filho);
+            } else {
+                pai.setDir(filho);
+            }
+        } else {
+            No<T> sucessor = alvo.getDir();
+            No<T> paiSucessor = alvo;
+
+            while (sucessor.getEsq() != null) {
+                paiSucessor = sucessor;
+                sucessor = sucessor.getEsq();
+            }
+
+            alvo = new No<>(sucessor.getId(), sucessor.getDados());
+
+            if (paiSucessor.getEsq() == sucessor) {
+                paiSucessor.setEsq(sucessor.getDir());
+            } else {
+                paiSucessor.setDir(sucessor.getDir());
+            }
+        }
+
+        qntd--;
+    }
+
+	    public No<T> busca(int chave) {
+	        // Inicia a busca a partir da raiz principal da árvore
+	        return busca(getRaiz(), chave);
+	    }
+	
+	    private No<T> busca(No<T> raiz, int chave) {
+	        if (raiz == null || raiz.getId() == chave) {
+	            return raiz;
+	        } else if (raiz.getId() > chave) {
+	            return busca(raiz.getEsq(), chave);
+	        } else {
+	            return busca(raiz.getDir(), chave);
+	        }
+	    }
+	}
+

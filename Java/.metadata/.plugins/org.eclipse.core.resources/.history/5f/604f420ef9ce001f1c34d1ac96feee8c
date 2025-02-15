@@ -1,0 +1,65 @@
+package Arvore;
+
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        ABB<Object> arvore = new ABB<>();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Bem-vindo à Árvore Binária de Busca (ABB)!");
+        
+        while (true) {
+            System.out.println("\nEscolha uma opção:");
+            System.out.println("1 - Inserir nó na árvore");
+            System.out.println("2 - Imprimir em Pré-Ordem");
+            System.out.println("3 - Imprimir em Ordem Simétrica");
+            System.out.println("4 - Imprimir em Pós-Ordem");
+            System.out.println("5 - Imprimir por Nível");
+            System.out.println("0 - Sair");
+            System.out.print("Opção: ");
+            int opcao = scanner.nextInt();
+
+            switch (opcao) {
+                case 1: // Inserir nó
+                    System.out.print("Digite o ID (int): ");
+                    int id = scanner.nextInt();
+                    System.out.print("Digite os dados (pode ser texto ou número): ");
+                    scanner.nextLine(); // Limpa o buffer
+                    String dados = scanner.nextLine();
+                    arvore.inserir(id, dados);
+                    System.out.println("Nó inserido com sucesso!");
+                    break;
+
+                case 2: // Imprimir Pré-Ordem
+                    System.out.println("Impressão em Pré-Ordem:");
+                    arvore.imprimirPreOrdem();
+                    break;
+
+                case 3: // Imprimir em Ordem Simétrica
+                    System.out.println("Impressão em Ordem Simétrica:");
+                    arvore.imprimirOrdemSimetrica(arvore.getRaiz()); // Adaptação do método
+                    break;
+
+                case 4: // Imprimir em Pós-Ordem
+                    System.out.println("Impressão em Pós-Ordem:");
+                    arvore.imprimirPosOrdem(arvore.getRaiz()); // Adaptação do método
+                    break;
+
+                case 5: // Imprimir por Nível
+                    System.out.println("Impressão por Nível:");
+                    arvore.imprimirNivel();
+                    break;
+
+                case 0: // Sair
+                    System.out.println("Encerrando o programa...");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        }
+    }
+}
